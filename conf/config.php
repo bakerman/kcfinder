@@ -105,6 +105,11 @@ return array(
     'cookiePath' => "",
     'cookiePrefix' => 'KCFINDER_',
 
+    "hide"  => array(
+        "_cache",
+        ".htaccess",
+        "conf",
+    ),
 
 // THE FOLLOWING SETTINGS CANNOT BE OVERRIDED WITH SESSION SETTINGS
 

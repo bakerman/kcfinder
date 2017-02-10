@@ -710,46 +710,50 @@ class browser extends uploader {
 
         foreach ($files as $file) {
 
-            $img = new fastImage($file);
-            $type = $img->getType();
+			if (!in_Array(basename($file) , $this->config["hide"])) {
+				
+				$img = new fastImage($file);
+				$type = $img->getType();
 
-            if ($type !== false) {
-                $size = $img->getSize($file);
-                if (is_array($size) && count($size)) {
-                    $thumb_file = "$thumbDir/" . basename($file);
-                    if (!is_file($thumb_file))
-                        $this->makeThumb($file, false);
-                    $smallThumb =
-                        ($size[0] <= $this->config['thumbWidth']) &&
-                        ($size[1] <= $this->config['thumbHeight']) &&
-                        in_array($type, array("gif", "jpeg", "png"));
-                } else
-                    $smallThumb = false;
-            } else
-                $smallThumb = false;
+				if ($type !== false) {
+					$size = $img->getSize($file);
+					if (is_array($size) && count($size)) {
+						$thumb_file = "$thumbDir/" . basename($file);
+						if (!is_file($thumb_file))
+							$this->makeThumb($file, false);
+						$smallThumb =
+							($size[0] <= $this->config['thumbWidth']) &&
+							($size[1] <= $this->config['thumbHeight']) &&
+							in_array($type, array("gif", "jpeg", "png"));
+					} else
+						$smallThumb = false;
+				} else
+					$smallThumb = false;
 
-            $img->close();
+				$img->close();
 
-            $stat = stat($file);
-            if ($stat === false) continue;
-            $name = basename($file);
-            $ext = file::getExtension($file);
-            $bigIcon = file_exists("themes/{$this->config['theme']}/img/files/big/$ext.png");
-            $smallIcon = file_exists("themes/{$this->config['theme']}/img/files/small/$ext.png");
-            $thumb = file_exists("$thumbDir/$name");
-            $return[] = array(
-                'name' => stripcslashes($name),
-                'size' => $stat['size'],
-                'mtime' => $stat['mtime'],
-                'date' => @strftime($this->dateTimeSmall, $stat['mtime']),
-                'readable' => is_readable($file),
-                'writable' => file::isWritable($file),
-                'bigIcon' => $bigIcon,
-                'smallIcon' => $smallIcon,
-                'thumb' => $thumb,
-                'smallThumb' => $smallThumb
-            );
-        }
+				$stat = stat($file);
+				if ($stat === false) continue;
+				$name = basename($file);
+				$ext = file::getExtension($file);
+				$bigIcon = file_exists("themes/{$this->config['theme']}/img/files/big/$ext.png");
+				$smallIcon = file_exists("themes/{$this->config['theme']}/img/files/small/$ext.png");
+				$thumb = file_exists("$thumbDir/$name");
+				$return[] = array(
+					'name' => stripcslashes($name),
+					'size' => $stat['size'],
+					'mtime' => $stat['mtime'],
+					'date' => @strftime($this->dateTimeSmall, $stat['mtime']),
+					'readable' => is_readable($file),
+					'writable' => file::isWritable($file),
+					'bigIcon' => $bigIcon,
+					'smallIcon' => $smallIcon,
+					'thumb' => $thumb,
+					'smallThumb' => $smallThumb
+				);
+			}
+
+		}
         return $return;
     }
 
@@ -816,10 +820,16 @@ class browser extends uploader {
         if (is_array($dirs)) {
             $writable = dir::isWritable($dir);
             foreach ($dirs as $cdir) {
-                $info = $this->getDirInfo($cdir);
-                if ($info === false) continue;
-                $info['removable'] = $writable && $info['writable'];
-                $return[] = $info;
+				
+				if (!in_Array(basename($cdir) , $this->config["hide"])) {
+					
+					$info = $this->getDirInfo($cdir);
+					if ($info === false) continue;
+					$info['removable'] = $writable && $info['writable'];
+					$return[] = $info;
+					
+				}
+
             }
         }
         return $return;
